@@ -1,0 +1,31 @@
+# 🔐 Secrets
+.env
+
+# 🧠 Obsidian system files
+vault/.obsidian/workspace
+vault/.obsidian/cache
+vault/.trash
+
+# 🐍 Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ⚙️ Virtual environments
+.venv/
+env/
+venv/
+
+# 💻 VS Code settings
+.vscode/
+
+# 🍏 macOS system files
+.DS_Store
+
+# 📦 Python dependency logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 🗃️ ChromaDB vector store (optional - if using persistent storage)
+chroma_db/
+

@@ -1,0 +1,2 @@
+
+Cal Newport argues that deep work is the ability to focus without distraction on a cognitively demanding task. He claims it's like a superpower in the modern economy. Shallow work, on the other hand, is low-value and easy to replicate
