@@ -1,83 +1,71 @@
+# 🧠 Second Brain
 
-# 🧠 Second Brain AI
-
-Chat with your personal knowledge vault using OpenAI, LangChain, and ChromaDB — all synced with your Obsidian notes.
-
-Built by [@pranavojha](https://github.com/pranavojha), powered by ChatGPT 💡
+An AI-powered second brain using Obsidian, LangChain, Chroma, and OpenAI.  
+Chat with your personal notes — right from the terminal or a web browser!
 
 ---
 
-## 🔍 What It Does
+## 🚀 How to Run
 
-- ✅ Loads your markdown notes from your Obsidian vault
-- 🧠 Embeds them using OpenAI’s `text-embedding-3-small`
-- 💾 Stores them locally using ChromaDB
-- 💬 Lets you chat with your notes via:
-  - Terminal (CLI)
-  - Streamlit web app
+This project supports **CLI mode** (terminal) and **Streamlit mode** (web app).
 
 ---
 
-## 🚀 Demo
+### ✅ CLI Mode (Terminal chat)
 
-> _“What do my notes say about deep work?”_  
-> _“Summarize my thoughts on startups.”_
-
-![screenshot](screenshot.png) <!-- Optional: Add a screenshot here -->
-
----
-
-## 🛠️ Tech Stack
-
-- [LangChain](https://www.langchain.com/)
-- [OpenAI API](https://platform.openai.com/)
-- [ChromaDB](https://www.trychroma.com/)
-- [Streamlit](https://streamlit.io/)
-- [Obsidian](https://obsidian.md/)
+Embed new notes and chat from the terminal:
+```bash
+python brain_chat/main.py cli
+```
 
 ---
 
-## ⚙️ How to Use
+### ✅ Streamlit Mode (Web GUI)
 
-1. Clone the repo  
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/second-brain-ai
-   cd second-brain-ai
-   ```
-
-2. Create `.env`  
-   ```
-   OPENAI_API_KEY=your_openai_key
-   ```
-
-3. Install dependencies  
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-4. Add your `.md` notes inside the `vault/` folder
-
-5. Run chatbot (CLI)  
-   ```bash
-   python brain_chat/chat_with_vault.py
-   ```
-
-6. Or launch the web app  
-   ```bash
-   streamlit run brain_chat/second_brain_gui.py
-   ```
+Chat with your notes in a browser interface:
+```bash
+python brain_chat/main.py streamlit
+```
 
 ---
 
-## 🙏 Credits
+## 💾 Requirements
 
-Built by [@pranavojha](https://github.com/pranavojha) with support from ChatGPT.  
-LangChain is love. Markdown is power.
+- Python 3.9+
+- Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+- Create a `.env` file in the root folder:
+    ```
+    OPENAI_API_KEY=your_openai_api_key_here
+    ```
+
+---
+
+## 📦 Features
+
+✅ Load and embed `.md` notes from your Obsidian vault  
+✅ Track which notes have been embedded (no duplicates)  
+✅ Chat in the terminal or Streamlit  
+✅ Automatically updates only new files
+
+---
+
+## ⚠️ Known Warnings
+
+- Deprecation warnings from LangChain → safe to ignore for now  
+- `KeyboardInterrupt` on Ctrl+C → normal when stopping the app
+
+---
+
+## 🤝 Contributing
+
+Pull requests and ideas are welcome! Feel free to fork and improve.
 
 ---
 
 ## 📄 License
 
-MIT – free to use, learn, remix.
+MIT License
