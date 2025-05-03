@@ -29,3 +29,5 @@ pip-delete-this-directory.txt
 # 🗃️ ChromaDB vector store (optional - if using persistent storage)
 chroma_db/
 
+#Files that get saved as json
+brain_chat/embedded_files.json
