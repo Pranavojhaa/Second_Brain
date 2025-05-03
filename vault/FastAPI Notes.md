@@ -1,0 +1,12 @@
+- **What I learned **
+	- How to create an API 
+	- How to use .get, .put, .delete and .post 
+		- *.get*
+			- To get any value and output onto the API 
+		- *.put*
+			- To update Data Already in the API/Database
+		- *.post*
+			- To create data straight from the API, through the use of classes 
+		- *.delete*
+			- To remove any value from the database 
+	- 
