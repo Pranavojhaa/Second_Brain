@@ -1,10 +1,8 @@
 # Secrets
 .env
 
-# 🧠 Obsidian system files
-vault/.obsidian/workspace
-vault/.obsidian/cache
-vault/.trash
+#My personal Vault 
+vault/
 
 # Python cache
 __pycache__/
