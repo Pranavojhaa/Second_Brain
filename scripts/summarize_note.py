@@ -1,41 +1,41 @@
-import os
-from openai import OpenAI
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
 from dotenv import load_dotenv
+from openai import OpenAI
 
-# Load API Key from .env
 load_dotenv()
-client = OpenAI()
 
-# Path to your vault
-VAULT_PATH = "../vault"
-NOTE_NAME = "test.md"  # Change to any filename inside /vault
+BASE_DIR = Path(__file__).resolve().parent.parent
+VAULT_DIR = BASE_DIR / "vault"
 
-def summarize_note():
-    file_path = os.path.join(VAULT_PATH, NOTE_NAME)
 
-    # Read the note content
-    with open('/Users/pranavojha/ai-second-brain/vault/test.md', "r") as f:
-        content = f.read()
+def summarize_note(note_name: str) -> None:
+    file_path = VAULT_DIR / note_name
+    if not file_path.exists():
+        raise FileNotFoundError(f"Note not found: {file_path}")
 
-    # Generate summary using GPT
+    content = file_path.read_text()
+    client = OpenAI()
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant that summarizes notes."},
-            {"role": "user", "content": f"Summarize this note:\n\n{content}"}
-        ]
+            {"role": "user", "content": f"Summarize this note:\n\n{content}"},
+        ],
     )
 
-    summary = response.choices[0].message.content
-
-    # Add summary to top of note
+    summary = response.choices[0].message.content or ""
     new_content = f"## AI Summary\n{summary}\n\n---\n\n{content}"
+    file_path.write_text(new_content)
+    print(f"Summary added to {file_path.name}")
 
-    # Save the new content back to the same file
-    with open('/Users/pranavojha/ai-second-brain/vault/test.md', "w") as f:
-        f.write(new_content)
-
-    print("✅ Summary added to note!")
 
 if __name__ == "__main__":
-    summarize_note()
+    target_note = sys.argv[1] if len(sys.argv) > 1 else "test.md"
+    try:
+        summarize_note(target_note)
+    except Exception as exc:
+        print(exc)
