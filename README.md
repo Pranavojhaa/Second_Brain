@@ -67,6 +67,8 @@ Streamlit:
 streamlit run brain_chat/second_brain_gui.py
 ```
 
+After loading the local instance, open Obsidian and connect the local [`vault/`](/Users/pranavojha/ai-second-brain/vault) folder as your vault so the app and your notes stay in sync.
+
 ## Troubleshooting
 
 - `OPENAI_API_KEY is missing`
