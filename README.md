@@ -1,71 +1,92 @@
-# 🧠 Second Brain
+# Second Brain AI
 
-An AI-powered second brain using Obsidian, LangChain, Chroma, and OpenAI.  
-Chat with your personal notes — right from the terminal or a web browser!
+Chat with your Obsidian-style markdown notes using OpenAI, LangChain, and Chroma.
 
----
+## What It Does
 
-## 🚀 How to Run
+- Loads markdown notes from `vault/`
+- Creates embeddings with OpenAI
+- Stores vectors locally with Chroma
+- Lets you ask questions in:
+  - CLI
+  - Streamlit
 
-This project supports **CLI mode** (terminal) and **Streamlit mode** (web app).
+## Project Structure
 
----
-
-### ✅ CLI Mode (Terminal chat)
-
-Embed new notes and chat from the terminal:
-```bash
-python brain_chat/main.py cli
+```text
+brain_chat/
+  chat_with_vault.py    # CLI chat entry point
+  core.py               # Shared ingest + retrieval logic
+  ingest.py             # Embeds notes into Chroma
+  main.py               # Small launcher
+  second_brain_gui.py   # Streamlit UI
+scripts/
+  summarize_note.py     # Optional note summarizer
+vault/                  # Your markdown notes
+chroma_db/              # Local vector database
 ```
 
----
+## Setup
 
-### ✅ Streamlit Mode (Web GUI)
+1. Clone the repo
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/second-brain-ai
+   cd second-brain-ai
+   ```
 
-Chat with your notes in a browser interface:
+2. Create a virtual environment and install dependencies
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. Copy `.env.example` to `.env` and add your OpenAI key
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Put your markdown notes inside `vault/`
+
+5. Build or refresh the vector store
+   ```bash
+   python brain_chat/ingest.py
+   ```
+
+## Run
+
+CLI:
+
 ```bash
-python brain_chat/main.py streamlit
+python brain_chat/chat_with_vault.py
 ```
 
----
+Streamlit:
 
-## 💾 Requirements
+```bash
+streamlit run brain_chat/second_brain_gui.py
+```
 
-- Python 3.9+
-- Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+## Troubleshooting
 
-- Create a `.env` file in the root folder:
-    ```
-    OPENAI_API_KEY=your_openai_api_key_here
-    ```
+- `OPENAI_API_KEY is missing`
+  Add the key to `.env`
 
----
+- `No vectorstore found`
+  Run `python brain_chat/ingest.py` first
 
-## 📦 Features
+- Network-related OpenAI or `tiktoken` errors
+  Make sure the machine has internet access when embedding or querying
 
-✅ Load and embed `.md` notes from your Obsidian vault  
-✅ Track which notes have been embedded (no duplicates)  
-✅ Chat in the terminal or Streamlit  
-✅ Automatically updates only new files
+## Tech Stack
 
----
+- OpenAI
+- LangChain
+- langchain-openai
+- langchain-chroma
+- Streamlit
+- Obsidian-style markdown notes
 
-## ⚠️ Known Warnings
+## License
 
-- Deprecation warnings from LangChain → safe to ignore for now  
-- `KeyboardInterrupt` on Ctrl+C → normal when stopping the app
-
----
-
-## 🤝 Contributing
-
-Pull requests and ideas are welcome! Feel free to fork and improve.
-
----
-
-## 📄 License
-
-MIT License
+MIT
