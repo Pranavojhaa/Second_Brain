@@ -19,7 +19,10 @@ if not has_openai_api_key():
     st.stop()
 
 if not has_vectorstore():
-    st.error("No vectorstore found yet. Run `python brain_chat/ingest.py` first.")
+    st.error(
+        "No vectorstore found yet. Run `python brain_chat/ingest.py` first, "
+        "or set `AUTO_INGEST_ON_STARTUP=true` in Railway after mounting your vault."
+    )
     st.stop()
 
 try:

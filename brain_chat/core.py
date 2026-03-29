@@ -165,6 +165,10 @@ def create_chat_model() -> ChatOpenAI:
 
 def load_and_chunk_notes() -> list[Document]:
     already_embedded = _read_embedded_files()
+    if not VAULT_DIR.exists():
+        print(f"Vault directory does not exist yet: {VAULT_DIR}")
+        return []
+
     loader = DirectoryLoader(
         str(VAULT_DIR),
         glob="**/*.md",
@@ -218,7 +222,7 @@ def ingest_notes() -> bool:
 
 
 def has_vectorstore() -> bool:
-    return CHROMA_DIR.exists()
+    return CHROMA_DIR.exists() and any(CHROMA_DIR.iterdir())
 
 
 def load_vectorstore() -> Chroma:
