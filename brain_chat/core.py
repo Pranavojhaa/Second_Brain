@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
-from langchain.chains import ConversationalRetrievalChain
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
+from langchain_core.documents import Document
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -21,6 +23,45 @@ TRACKER_PATH = Path(
 ).expanduser()
 EMBEDDING_MODEL = "text-embedding-3-small"
 CHAT_MODEL = "gpt-4o-mini"
+
+ANSWER_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You answer questions using only the provided note context. "
+            "If the notes do not contain the answer, say that clearly.",
+        ),
+        (
+            "human",
+            "Context:\n{context}\n\nChat history:\n{chat_history}\n\nQuestion: {question}",
+        ),
+    ]
+)
+
+
+class NotesQAChain:
+    def __init__(self, llm: ChatOpenAI, vectorstore: Chroma) -> None:
+        self.llm = llm
+        self.retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+
+    def invoke(self, inputs: dict[str, Any]) -> dict[str, Any]:
+        question = str(inputs.get("question", "")).strip()
+        chat_history = inputs.get("chat_history", [])
+        docs = self.retriever.invoke(question)
+        context = _format_documents(docs)
+        history_text = _format_chat_history(chat_history)
+        prompt = ANSWER_PROMPT.invoke(
+            {
+                "context": context or "No relevant notes were retrieved.",
+                "chat_history": history_text or "No previous chat history.",
+                "question": question,
+            }
+        )
+        response = self.llm.invoke(prompt)
+        return {
+            "answer": response.content,
+            "source_documents": docs,
+        }
 
 
 def _read_embedded_files() -> set[str]:
@@ -36,6 +77,28 @@ def _read_embedded_files() -> set[str]:
 def _write_embedded_files(file_paths: set[str]) -> None:
     TRACKER_PATH.parent.mkdir(parents=True, exist_ok=True)
     TRACKER_PATH.write_text(json.dumps(sorted(file_paths), indent=2))
+
+
+def _format_documents(documents: list[Document]) -> str:
+    if not documents:
+        return ""
+
+    chunks = []
+    for doc in documents:
+        source = Path(doc.metadata.get("source", "unknown")).name
+        chunks.append(f"[Source: {source}]\n{doc.page_content}")
+    return "\n\n".join(chunks)
+
+
+def _format_chat_history(chat_history: list[tuple[str, str]]) -> str:
+    if not chat_history:
+        return ""
+
+    lines = []
+    for question, answer in chat_history[-6:]:
+        lines.append(f"User: {question}")
+        lines.append(f"Assistant: {answer}")
+    return "\n".join(lines)
 
 
 def has_openai_api_key() -> bool:
@@ -121,9 +184,8 @@ def load_vectorstore() -> Chroma:
     )
 
 
-def build_qa_chain() -> ConversationalRetrievalChain:
-    return ConversationalRetrievalChain.from_llm(
+def build_qa_chain() -> NotesQAChain:
+    return NotesQAChain(
         llm=create_chat_model(),
-        retriever=load_vectorstore().as_retriever(),
-        return_source_documents=True,
+        vectorstore=load_vectorstore(),
     )
