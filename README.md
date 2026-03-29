@@ -64,7 +64,7 @@ python brain_chat/chat_with_vault.py
 Streamlit:
 
 ```bash
-streamlit run brain_chat/second_brain_gui.py
+python -m brain_chat.main streamlit
 ```
 
 After loading the local instance, open Obsidian and connect the local [`vault/`](/Users/pranavojha/ai-second-brain/vault) folder as your vault so the app and your notes stay in sync.
@@ -79,6 +79,40 @@ After loading the local instance, open Obsidian and connect the local [`vault/`]
 
 - Network-related OpenAI or `tiktoken` errors
   Make sure the machine has internet access when embedding or querying
+
+## Deploy on Railway
+
+This repo includes a [`Procfile`](/Users/pranavojha/ai-second-brain/Procfile) and [`railway.json`](/Users/pranavojha/ai-second-brain/railway.json) so Railway can start the Streamlit app with the correct host and port settings.
+
+Recommended Railway setup:
+
+1. Create a new Railway project from this repo
+2. Add `OPENAI_API_KEY` as an environment variable
+3. Mount a persistent volume and point these variables at it:
+   ```text
+   VAULT_DIR=/data/vault
+   CHROMA_DIR=/data/chroma_db
+   TRACKER_PATH=/data/embedded_files.json
+   ```
+4. Upload or sync your markdown notes into `VAULT_DIR`
+5. Run one ingest job with:
+   ```bash
+   python brain_chat/ingest.py
+   ```
+   Or set:
+   ```text
+   AUTO_INGEST_ON_STARTUP=true
+   ```
+   if you want the app to build the vector store automatically when it first boots without one
+
+Important:
+
+- Railway filesystems are ephemeral unless you use a mounted volume
+- If you deploy without a persistent volume, your uploaded notes and vector store will disappear on restart
+- The default web start command is:
+  ```bash
+  python -m brain_chat.main streamlit
+  ```
 
 ## Tech Stack
 

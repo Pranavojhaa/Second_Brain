@@ -1,50 +1,57 @@
 import streamlit as st
-from dotenv import load_dotenv
-from langchain_community.embeddings import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
-from langchain_community.chat_models import ChatOpenAI
-from langchain.chains import ConversationalRetrievalChain
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+import sys
+from pathlib import Path
 
+if __package__ is None or __package__ == "":
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-# Load .env
-load_dotenv()
+from brain_chat.core import build_qa_chain, has_openai_api_key, has_vectorstore
 
-# Initialize
-st.set_page_config(page_title="Second Brain Chat 💬", layout="centered")
-st.title("🧠 Talk to Your Second Brain")
+st.set_page_config(page_title="Second Brain Chat", layout="centered")
+st.title("Talk to Your Second Brain")
 st.markdown("Ask questions based on your Obsidian notes.")
 
-# Set up session state
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# Load vectorstore
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-vectorstore = Chroma(
-    persist_directory="chroma_db",
-    embedding_function=embeddings
-)
+if not has_openai_api_key():
+    st.error("OPENAI_API_KEY is missing. Add it to your .env before starting the app.")
+    st.stop()
 
-# Set up chain
-llm = ChatOpenAI(model_name="gpt-3.5-turbo")
-qa_chain = ConversationalRetrievalChain.from_llm(
-    llm=llm,
-    retriever=vectorstore.as_retriever(),
-    return_source_documents=True
-)
+if not has_vectorstore():
+    st.error(
+        "No vectorstore found yet. Run `python brain_chat/ingest.py` first, "
+        "or set `AUTO_INGEST_ON_STARTUP=true` in Railway after mounting your vault."
+    )
+    st.stop()
 
-# Chat input
+try:
+    qa_chain = build_qa_chain()
+except Exception as exc:
+    st.error(f"Unable to load the chat pipeline: {exc}")
+    st.stop()
+
+for question, answer in st.session_state.chat_history:
+    with st.chat_message("user"):
+        st.markdown(question)
+    with st.chat_message("assistant"):
+        st.markdown(answer)
+
 user_query = st.chat_input("Ask your brain something...")
 
 if user_query:
-    with st.spinner("Thinking..."):
-        result = qa_chain({"question": user_query, "chat_history": st.session_state.chat_history})
-        answer = result["answer"]
-        st.session_state.chat_history.append((user_query, answer))
+    with st.chat_message("user"):
+        st.markdown(user_query)
 
-# Display history
-for i, (q, a) in enumerate(reversed(st.session_state.chat_history)):
-    st.markdown(f"**You:** {q}")
-    st.markdown(f"**🧠 Second Brain:** {a}")
-    st.markdown("---")
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            try:
+                result = qa_chain.invoke(
+                    {"question": user_query, "chat_history": st.session_state.chat_history}
+                )
+            except Exception as exc:
+                st.error(f"Chat request failed: {exc}")
+            else:
+                answer = result["answer"]
+                st.markdown(answer)
+                st.session_state.chat_history.append((user_query, answer))
