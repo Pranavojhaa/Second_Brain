@@ -46,6 +46,12 @@ class NotesQAChain:
 
     def invoke(self, inputs: dict[str, Any]) -> dict[str, Any]:
         question = str(inputs.get("question", "")).strip()
+        if not question:
+            return {
+                "answer": "Ask a question to search your notes.",
+                "source_documents": [],
+            }
+
         chat_history = inputs.get("chat_history", [])
         docs = self.retriever.invoke(question)
         context = _format_documents(docs)
@@ -58,8 +64,11 @@ class NotesQAChain:
             }
         )
         response = self.llm.invoke(prompt)
+        answer = response.content
+        if not isinstance(answer, str):
+            answer = str(answer)
         return {
-            "answer": response.content,
+            "answer": answer,
             "source_documents": docs,
         }
 
@@ -69,14 +78,14 @@ def _read_embedded_files() -> set[str]:
         return set()
 
     try:
-        return set(json.loads(TRACKER_PATH.read_text()))
-    except json.JSONDecodeError:
+        return set(json.loads(TRACKER_PATH.read_text(encoding="utf-8")))
+    except (json.JSONDecodeError, OSError):
         return set()
 
 
 def _write_embedded_files(file_paths: set[str]) -> None:
     TRACKER_PATH.parent.mkdir(parents=True, exist_ok=True)
-    TRACKER_PATH.write_text(json.dumps(sorted(file_paths), indent=2))
+    TRACKER_PATH.write_text(json.dumps(sorted(file_paths), indent=2), encoding="utf-8")
 
 
 def _format_documents(documents: list[Document]) -> str:
@@ -127,7 +136,12 @@ def load_and_chunk_notes() -> list:
         show_progress=True,
     )
 
-    all_docs = loader.load()
+    try:
+        all_docs = loader.load()
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"Unable to load notes from {VAULT_DIR}: {exc}")
+        return []
+
     new_docs = [doc for doc in all_docs if doc.metadata["source"] not in already_embedded]
     if not new_docs:
         print("No new notes found to embed.")

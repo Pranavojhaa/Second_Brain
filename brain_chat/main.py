@@ -44,18 +44,29 @@ def maybe_auto_ingest() -> None:
         print(f"Automatic ingest skipped: {exc}")
 
 
-if __name__ == "__main__":
-    args = {arg.lower() for arg in sys.argv[1:]}
+def run(argv: list[str] | None = None) -> int:
+    args = {arg.lower() for arg in (argv or sys.argv[1:])}
 
     if "ingest" in args:
         try:
             ingest_notes()
         except Exception as exc:
             print(exc)
-            sys.exit(1)
+            return 1
+        return 0
 
     if "streamlit" in args:
         maybe_auto_ingest()
         start_streamlit()
-    else:
+        return 0
+
+    if "cli" in args or not args:
         start_chat()
+        return 0
+
+    print("Unknown mode. Use one of: cli, ingest, streamlit")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(run())
