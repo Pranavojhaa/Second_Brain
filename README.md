@@ -82,7 +82,7 @@ After loading the local instance, open Obsidian and connect the local [`vault/`]
 
 ## Deploy on Railway
 
-This repo includes a [`Procfile`](/Users/pranavojha/ai-second-brain/Procfile) and [`railway.json`](/Users/pranavojha/ai-second-brain/railway.json) so Railway can start the Streamlit app with the correct host and port settings.
+This repo includes a [`Procfile`](/Users/pranavojha/ai-second-brain/Procfile), [`railway.json`](/Users/pranavojha/ai-second-brain/railway.json), [`nixpacks.toml`](/Users/pranavojha/ai-second-brain/nixpacks.toml), and [`runtime.txt`](/Users/pranavojha/ai-second-brain/runtime.txt) so Railway can detect Python reliably and start the Streamlit app with the correct host and port settings.
 
 Recommended Railway setup:
 
