@@ -12,7 +12,6 @@ if __name__ == "__main__":
         did_ingest = ingest_notes()
     except Exception as exc:
         print(exc)
-        sys.exit(1)
     else:
         if not did_ingest:
             print("Vectorstore is already up to date.")

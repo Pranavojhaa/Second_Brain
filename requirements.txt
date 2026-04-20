@@ -3,7 +3,6 @@ langchain
 langchain-community
 langchain-chroma
 langchain-openai
-langchain-text-splitters
 chromadb
 tiktoken
 python-dotenv

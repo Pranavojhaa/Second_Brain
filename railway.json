@@ -1,8 +1,0 @@
-{
-  "$schema": "https://railway.com/railway.schema.json",
-  "deploy": {
-    "startCommand": "python -m brain_chat.main streamlit",
-    "healthcheckPath": "/",
-    "healthcheckTimeout": 120
-  }
-}
