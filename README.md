@@ -3,6 +3,10 @@
 Chat with your Obsidian-style markdown notes. Notes are chunked into a local Chroma
 vector store; every answer lists the note excerpts retrieved for it.
 
+**Live demo:** [secondbraindemo.streamlit.app](https://secondbraindemo.streamlit.app/), the same UI
+over three sample notes in offline mode (keyword retrieval, no LLM). It may take a moment to
+wake up if nobody has used it recently.
+
 ![Streamlit UI in offline mode, answering from the sample vault](docs/screenshot.png)
 
 *Offline mode, answering from `sample_vault/`.*
@@ -59,7 +63,8 @@ lives in the system temp folder. Try it locally:
 streamlit run brain_chat/demo_app.py
 ```
 
-To host it, deploy this repo on [Streamlit Community Cloud](https://share.streamlit.io) with
+It is hosted at [secondbraindemo.streamlit.app](https://secondbraindemo.streamlit.app/). To
+host your own, deploy this repo on [Streamlit Community Cloud](https://share.streamlit.io) with
 `brain_chat/demo_app.py` as the main file. No secrets are needed. Questions typed into the demo
 are stored in its temporary index as conversation memory; offline mode never shows them back.
 
