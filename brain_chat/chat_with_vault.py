@@ -4,14 +4,10 @@ import sys
 if __package__ is None or __package__ == "":
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from brain_chat.core import build_qa_chain, has_openai_api_key
+from brain_chat.core import AI_MODE, build_qa_chain, cited_lines
 
 
 def start_chat() -> None:
-    if not has_openai_api_key():
-        print("OPENAI_API_KEY is missing. Add it to your .env before starting chat.")
-        return
-
     try:
         qa_chain = build_qa_chain()
     except Exception as exc:
@@ -22,7 +18,10 @@ def start_chat() -> None:
     print("\nChat with your second brain. Type 'exit' to quit.\n")
 
     while True:
-        query = input("You: ").strip()
+        try:
+            query = input("You: ").strip()
+        except EOFError:
+            break
         if not query:
             continue
         if query.lower() in {"exit", "quit"}:
@@ -36,7 +35,13 @@ def start_chat() -> None:
             continue
 
         answer = result["answer"]
-        print(f"\nSecond Brain: {answer}\n")
+        sources = ", ".join(result["sources"]) or "none"
+        print(f"\nSecond Brain: {answer}\nRetrieved notes: {sources}")
+        cited = cited_lines(result) if AI_MODE != "off" else []
+        if cited:
+            print("Cited in answer (pointer only, not checked against the claim):")
+            print("\n".join(cited))
+        print()
         chat_history.append((query, answer))
 
 

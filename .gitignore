@@ -1,8 +1,9 @@
 # Secrets
 .env
 
-# Personal vault content
+# Personal vault content (sample_vault/ is the tracked example)
 vault/
+brain_projects/
 
 # Python cache
 __pycache__/

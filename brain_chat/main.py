@@ -10,7 +10,16 @@ from brain_chat.core import ingest_notes
 
 
 def start_streamlit() -> None:
-    subprocess.run(["streamlit", "run", "brain_chat/second_brain_gui.py"], check=False)
+    subprocess.run(
+        [
+            sys.executable, "-m", "streamlit", "run", str(Path(__file__).with_name("second_brain_gui.py")),
+            "--server.address", "localhost", "--browser.gatherUsageStats", "false",
+        ],
+        cwd=Path(__file__).resolve().parent.parent,
+        check=False,
+    )
+
+
 if __name__ == "__main__":
     args = {arg.lower() for arg in sys.argv[1:]}
 
