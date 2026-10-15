@@ -129,8 +129,8 @@ pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-`.github/workflows/tests.yml` defines a test run on Python 3.9 and 3.12. It has not yet run
-on GitHub; the suite was verified locally on Python 3.9 and 3.12 (macOS). The 3.12 job
+`.github/workflows/tests.yml` runs the suite on Python 3.9 and 3.12 (ubuntu-latest) on every
+push and pull request; it was also verified locally on both versions (macOS). The 3.12 job
 installs with `-c requirements-lock.txt`, a freeze taken on macOS; Linux-only dependencies
 (e.g. watchdog) are unpinned.
 
