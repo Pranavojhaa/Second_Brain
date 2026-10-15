@@ -17,9 +17,9 @@ The app is offline by default. AI is an optional connector you switch on in `.en
 | `openai` | OpenAI `text-embedding-3-small` | `gpt-4o-mini`, instructed to cite notes as `[n]` | OpenAI API, needs `OPENAI_API_KEY` |
 
 `off` mode sends nothing off your machine. `python brain_chat/main.py streamlit` binds the UI
-to localhost with Streamlit usage stats off from any directory; a bare `streamlit run` gets the
-same settings from `.streamlit/config.toml` only when launched from the repo root. Offline
-answers are shown as plain text, so a note that embeds a remote image does not fetch it.
+to localhost with Streamlit usage stats off. A bare `streamlit run` listens on all interfaces
+(Streamlit's default), so use the launcher for your own notes. Offline answers are shown as
+plain text, so a note that embeds a remote image does not fetch it.
 
 Each mode keeps its own Chroma collection, so run ingest again after switching.
 
@@ -48,6 +48,20 @@ Streamlit UI:
 ```bash
 python brain_chat/main.py streamlit
 ```
+
+### Public demo
+
+`brain_chat/demo_app.py` runs the same UI over `sample_vault/` only: offline mode, no API key,
+and it ignores `.env`, `vault/` and `VAULT_DIR`, so personal notes are never served. Its index
+lives in the system temp folder. Try it locally:
+
+```bash
+streamlit run brain_chat/demo_app.py
+```
+
+To host it, deploy this repo on [Streamlit Community Cloud](https://share.streamlit.io) with
+`brain_chat/demo_app.py` as the main file. No secrets are needed. Questions typed into the demo
+are stored in its temporary index as conversation memory; offline mode never shows them back.
 
 ### Use your own notes
 
@@ -142,12 +156,13 @@ brain_chat/
   ingest.py             # Sync the vault into Chroma
   chat_with_vault.py    # CLI chat
   second_brain_gui.py   # Streamlit UI
+  demo_app.py           # Public demo: same UI over sample_vault/, offline
   main.py               # Launcher: python brain_chat/main.py [ingest] [streamlit]
 scripts/
   summarize_note.py     # Optional, openai only: prepends an AI summary, rewriting the note in place
 sample_vault/           # Example notes
 tests/                  # Offline test suite
-.streamlit/config.toml  # Localhost binding, usage stats off (repo-root launches only)
+.streamlit/config.toml  # Streamlit usage stats off (repo-root launches)
 ```
 
 ## Troubleshooting

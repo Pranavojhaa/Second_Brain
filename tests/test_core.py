@@ -305,3 +305,21 @@ def test_openai_mode_requires_key(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     with pytest.raises(RuntimeError, match="OPENAI_API_KEY"):
         core.create_embeddings()
+
+
+def test_demo_app_answers_from_sample_vault(tmp_path, monkeypatch):
+    from streamlit.testing.v1 import AppTest
+
+    # The demo pins core's globals; restore them afterwards and keep its store in tmp_path.
+    for name in ("AI_MODE", "VAULT_DIR", "CHROMA_DIR"):
+        monkeypatch.setattr(core, name, getattr(core, name))
+    monkeypatch.setattr("tempfile.tempdir", str(tmp_path))
+
+    app = AppTest.from_file(str(Path(__file__).resolve().parent.parent / "brain_chat" / "demo_app.py"))
+    app.run(timeout=60)
+    assert not app.exception
+    app.chat_input[0].set_value("how do I update data with fastapi?").run(timeout=60)
+
+    assert not app.exception
+    assert "Retrieved notes: FastAPI Notes.md" in [caption.value for caption in app.caption]
+    assert core.VAULT_DIR.name == "sample_vault" and core.CHROMA_DIR.parent == tmp_path
